@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Sistema de Viagens</title>
+</head>
+<body>
+
+  <h1>Registrar Viagem</h1>
+
+  <form id="formViagem">
+    <input type="text" id="cliente" placeholder="Nome do Cliente" required><br>
+    <input type="text" id="origem" placeholder="Origem" required><br>
+    <input type="text" id="destino" placeholder="Destino" required><br>
+    <input type="date" id="data" required><br>
+    <input type="text" id="motorista" placeholder="Motorista" required><br>
+    <input type="number" id="valor" placeholder="Valor (R$)" required><br>
+    <button type="submit">Salvar Viagem</button>
+  </form>
+
+  <h2>Viagens Registradas</h2>
+  <ul id="listaViagens"></ul>
+
+  <script>
+    const form = document.getElementById('formViagem');
+    const lista = document.getElementById('listaViagens');
+
+    function salvarViagens(viagens) {
+      localStorage.setItem('viagens', JSON.stringify(viagens));
+    }
+
+    function carregarViagens() {
+      const viagens = JSON.parse(localStorage.getItem('viagens')) || [];
+      return viagens;
+    }
+
+    function exibirViagens() {
+      lista.innerHTML = '';
+      const viagens = carregarViagens();
+      viagens.forEach((v, i) => {
+        const li = document.createElement('li');
+        li.innerText = `${v.data} | ${v.cliente} | ${v.origem} → ${v.destino} | R$ ${v.valor} | Motorista: ${v.motorista}`;
+        const btn = document.createElement('button');
+        btn.innerText = 'Excluir';
+        btn.onclick = () => {
+          viagens.splice(i, 1);
+          salvarViagens(viagens);
+          exibirViagens();
+        };
+        li.appendChild(btn);
+        lista.appendChild(li);
+      });
+    }
+
+    form.onsubmit = function (e) {
+      e.preventDefault();
+      const novaViagem = {
+        cliente: form.cliente.value,
+        origem: form.origem.value,
+        destino: form.destino.value,
+        data: form.data.value,
+        motorista: form.motorista.value,
+        valor: form.valor.value
+      };
+      const viagens = carregarViagens();
+      viagens.push(novaViagem);
+      salvarViagens(viagens);
+      form.reset();
+      exibirViagens();
+    };
+
+    exibirViagens();
+  </script>
+
+</body>
+</html>
